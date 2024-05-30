@@ -1,5 +1,7 @@
-import imagej
 import sys
-ij = imagej.init(['ch.epfl.biop:ijp-kheops'])
+from d10n import *
 
-setup(sys.argv[0])
+# breakpoint()
+ds : DigiSlide = setup(sys.argv[1])
+metadata_prep(ds)
+convert(ds)

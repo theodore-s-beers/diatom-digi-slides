@@ -1,0 +1,1 @@
+from .digislide import DigiSlide
