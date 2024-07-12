@@ -19,4 +19,6 @@ def metadata_prep(ds : DigiSlide):
     metadata.make_new_dir(ds)
 
 def convert(ds : DigiSlide):
-    dij.stitch(ds, ds.min_z)
+    for z in range(ds.min_z, ds.max_z + 1):
+        dij.stitch(ds, z)
+        dij.con_ome_tif(ds, z)

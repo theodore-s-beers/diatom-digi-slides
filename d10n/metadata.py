@@ -11,7 +11,7 @@ def make_tile_config(ds : DigiSlide):
     h_scale = None
     with open(ds.xy_path, newline='', encoding="utf_16_le") as csvfile:
         r = csv.reader(csvfile, delimiter=',', skipinitialspace=True)
-        r.__next__()
+        next(r)
         for row in r:
             # breakpoint()
             x_curr = float(row[1])
@@ -41,3 +41,8 @@ def make_tile_config(ds : DigiSlide):
 def make_new_dir(ds : DigiSlide):
     if not os.path.exists(ds.new_dir):
         os.makedirs(ds.new_dir)
+
+    for z in range(ds.min_z, ds.max_z + 1):
+        z_dir = ds.new_z_dir(z)
+        if not os.path.exists(z_dir):
+            os.makedirs(z_dir)
