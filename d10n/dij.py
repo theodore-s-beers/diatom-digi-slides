@@ -3,6 +3,7 @@ import imagej
 import os
 import shutil
 import subprocess
+import csv
 from .classes import DigiSlide
 
 stitch_file = "img_t1_z1_c1"
@@ -52,13 +53,14 @@ def _clean(ds : DigiSlide, z : int):
             if os.path.isfile(f_path) or os.path.islink(f_path):
                 os.unlink(f_path)
             elif os.path.isdir(f_path):
-                shutil.rmtree(file_path)
+                shutil.rmtree(f_path)
         except Exception as e:
             print('Failed to delete %s. Reason: %s' % (file_path, e))
 
 def stitch(ds : DigiSlide, z : int):
     out_path = f"{ds.new_dir}/{ds.new_z_tif(z)}"
-    exist = os.path.exists(out_path)
+    ome_path = f'{ds.new_dir}/{ds.new_z_name(z)}.ome.tiff'
+    exist = os.path.exists(out_path) or os.path.exists(ome_path)
     if not exist:
         error_check(_stitch, _clean, 3, ds, z)
         os.rename(f"{ds.new_z_dir(z)}/{stitch_file}", out_path)
@@ -67,18 +69,33 @@ def _con_ome_tif(ij, ds : DigiSlide, z : int):
     # breakpoint()
     rp_path = f'{ds.new_z_dir(z)}/raw_pyramid'
     ot_path = f'{ds.new_dir}/{ds.new_z_name(z)}.ome.tiff'
-    if not os.path.exists(rp_path):
+    max_workers = 4
+    try:
+        from java.lang import Runtime
+        runtime = Runtime.getRuntime()
+        res = runtime.availableProcessors()
+        if res > max_workers:
+            workers = res
+    except ImportError:
+        pass
+    except IOError:
+        pass
+    if not os.path.exists(rp_path) and not os.path.exists(ot_path):
         subprocess.run([
             'bioformats2raw',
             f'{ds.new_dir}/{ds.new_z_tif(z)}',
-            rp_path], check=True)
+            rp_path,
+            '--max_workers',
+            max_workers], check=True)
     if not os.path.exists(ot_path):
         subprocess.run([
             'raw2ometiff',
             rp_path,
             ot_path,
             '--compression',
-            'JPEG-2000'], check=True)
+            'JPEG-2000',
+            '--max_workers',
+            max_workers], check=True)
 
     # Attempt 2
     #temp_dir = f"{ds.new_z_dir(z)}/temp"
@@ -113,3 +130,28 @@ def _con_ome_tif(ij, ds : DigiSlide, z : int):
 
 def con_ome_tif(ds : DigiSlide, z : int):
     error_check(_con_ome_tif, _clean, 3, ds, z)
+    _clean(ds, z)
+
+def last_clean(ds : DigiSlide, z : int):
+    dir_path = ds.new_z_dir(z)
+    old_path = f'{ds.new_dir}/{ds.new_z_tif(z)}'
+    if os.path.isfile(old_path) or os.path.islink(old_path):
+        os.unlink(old_path)
+    if os.path.isdir(dir_path):
+        shutil.rmtree(dir_path)
+
+def move_metadata(ds : DigiSlide):
+    new_xyz = f'{ds.new_dir}/XYZPositions.csv'
+    new_sws = f'{ds.new_dir}/{ds.new_meta_str}.sws'
+    if not os.path.exists(new_xyz):
+        with open(ds.xy_path, newline='', encoding="utf_16_le") as old_csvf:
+            r = csv.DictReader(old_csvf, delimiter=',', skipinitialspace=True)
+            fieldnames = r.fieldnames
+            with open(new_xyz, 'w', newline='') as new_csvf:
+                writer = csv.DictWriter(new_csvf, fieldnames=fieldnames)
+                writer.writeheader()
+                for row in r:
+                    writer.writerow(row)
+
+    if not os.path.exists(new_sws):
+        shutil.copyfile(ds.sws_path, new_sws)
