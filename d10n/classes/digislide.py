@@ -1,5 +1,6 @@
-import re
 import csv
+import re
+
 
 class DigiSlide:
     def __init__(self, dir_name, slide, metadata):
@@ -19,7 +20,11 @@ class DigiSlide:
         self.z_dist = None
         self._z_stack()
         self._parse_meta()
-        short_meta = [self.zoom, self.illumination, f"{(self.max_z - self.min_z + 1):02d}z"]
+        short_meta = [
+            self.zoom,
+            self.illumination,
+            f"{(self.max_z - self.min_z + 1):02d}z",
+        ]
         self.short_meta = filter(bool, short_meta)
         self.new_meta_str = f"{slide}_{'_'.join(short_meta)}"
         self.new_dir = f"{dir_name}/{self.new_meta_str}"
@@ -32,16 +37,16 @@ class DigiSlide:
         return f"{self.new_meta_str}_Z{(z_norm):02d}"
 
     def new_z_dir(self, z):
-        z_norm = z - self.min_z + 1
+        # z_norm = z - self.min_z + 1
         return f"{self.new_dir}/{self.new_z_name(z)}"
 
     def new_z_tif(self, z):
-        z_norm = z - self.min_z + 1
+        # z_norm = z - self.min_z + 1
         return f"{self.new_z_name(z)}.tif"
 
     def _z_stack(self):
-        with open(self.xy_path, newline='', encoding="utf_16_le") as csvfile:
-            r = csv.reader(csvfile, delimiter=',', skipinitialspace=True)
+        with open(self.xy_path, newline="", encoding="utf_16_le") as csvfile:
+            r = csv.reader(csvfile, delimiter=",", skipinitialspace=True)
             next(r)
             z_found = set()
             for row in r:
@@ -59,11 +64,11 @@ class DigiSlide:
 
     def _parse_meta(self):
         for field in self.metadata:
-            if re.fullmatch(r'[A-Z]{2,4}', field):
+            if re.fullmatch(r"[A-Z]{2,4}", field):
                 self.illumination = field
-            elif re.fullmatch(r'\d{2}x', field):
+            elif re.fullmatch(r"\d{2}x", field):
                 self.zoom = field
-            elif re.fullmatch(r'\d*\.?\d*um', field):
+            elif re.fullmatch(r"\d*\.?\d*um", field):
                 self.z_dist = field
 
     def simple_dict(self):
@@ -76,6 +81,5 @@ class DigiSlide:
             "magnification": self.zoom,
             "illumination": self.illumination,
             "z_distance": self.z_dist,
-            "original_metadata": self.orig_meta_str
-            }
-
+            "original_metadata": self.orig_meta_str,
+        }
