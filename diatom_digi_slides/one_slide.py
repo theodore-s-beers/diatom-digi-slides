@@ -1,8 +1,8 @@
 import sys
 from datetime import datetime
 
-from d10n.basic import archive, convert, metadata_prep, setup
-from d10n.classes.digislide import DigiSlide
+from .d10n.basic import archive, convert, metadata_prep, setup
+from .d10n.classes.digislide import DigiSlide
 
 # Notes from Theo on getting this to run:
 # - pyimagej installed as Python dep via uv (see pyproject.toml)

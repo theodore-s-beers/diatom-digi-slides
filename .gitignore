@@ -1,4 +1,7 @@
-**/__pycache__/**
+**/__pycache__/
 .mypy_cache/
 .ruff_cache/
 .venv/
+*.egg-info/
+/build/
+*.pex
