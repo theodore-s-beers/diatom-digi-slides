@@ -35,6 +35,12 @@ def convert(ds: DigiSlide) -> None:
 
 
 def archive(ds: DigiSlide) -> None:
+    # Zip output
     shutil.make_archive(ds.new_dir, "zip", ds.dir_name, ds.new_meta_str)
+
+    # Generate JSON metadata
     with open(f"{ds.new_dir}.json", "w") as f:
         json.dump(ds.simple_dict(), f)
+
+    # Delete output directory (not needed once zipped)
+    shutil.rmtree(ds.new_dir)
