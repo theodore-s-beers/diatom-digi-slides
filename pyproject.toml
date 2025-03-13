@@ -4,7 +4,13 @@ version = "0.1.0"
 description = "TBA"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["mypy>=1.15.0", "pex>=2.33.3", "pyimagej>=1.6.0", "ruff>=0.9.5"]
+dependencies = [
+  "mypy>=1.15.0",
+  "pex>=2.33.4",
+  "pyimagej>=1.6.0",
+  "pyright>=1.1.396",
+  "ruff>=0.10.0",
+]
 
 [project.scripts]
 one_slide = "diatom_digi_slides.one_slide:main"
