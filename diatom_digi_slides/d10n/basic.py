@@ -14,8 +14,9 @@ def setup(arg: str) -> DigiSlide:
     ap = os.path.abspath(arg)
     dn, bn = os.path.split(ap)
     meta = bn.split("_")
+    slide = meta.pop(0)
 
-    return DigiSlide(dn, bn, meta)
+    return DigiSlide(dn, slide, meta)
 
 
 def metadata_prep(ds: DigiSlide) -> None:
