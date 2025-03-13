@@ -12,14 +12,10 @@ def setup(arg: str) -> DigiSlide:
         raise ValueError(f"{arg} is not a directory")
 
     ap = os.path.abspath(arg)
-    if ap.endswith("/"):
-        ap = os.path.dirname(ap)
-
-    dn = os.path.dirname(ap)
-    bn = os.path.basename(ap)
+    dn, bn = os.path.split(ap)
     meta = bn.split("_")
-    slide = meta.pop(0)
-    return DigiSlide(dn, slide, meta)
+
+    return DigiSlide(dn, bn, meta)
 
 
 def metadata_prep(ds: DigiSlide) -> None:

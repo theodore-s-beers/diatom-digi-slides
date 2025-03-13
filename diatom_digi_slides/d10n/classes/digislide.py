@@ -1,33 +1,37 @@
 import csv
+import os
 import re
+from typing import Optional
 
 
 class DigiSlide:
-    def __init__(self, dir_name, slide, metadata):
-        self.dir_name = dir_name
-        self.slide = slide
-        self.sample = metadata[0]
-        self.metadata = metadata
-        self.orig_meta_str = f"{slide}_{'_'.join(metadata)}"
-        self.path = f"{dir_name}/{self.orig_meta_str}"
-        self.sws_path = f"{self.path}/{self.orig_meta_str}.sws"
-        self.data_path = f"{self.path}/{self.orig_meta_str}"
-        self.xy_path = f"{self.data_path}/XYZPositions.txt"
-        self.min_z = 0
-        self.max_z = 0
-        self.zoom = None
-        self.illumination = None
-        self.z_dist = None
+    def __init__(self, dir_name: str, slide: str, metadata: list[str]):
+        self.dir_name: str = dir_name
+        self.slide: str = slide
+        self.sample: str = metadata[0]
+        self.metadata: list[str] = metadata
+        self.orig_meta_str: str = f"{slide}_{'_'.join(metadata)}"
+        self.path: str = os.path.join(dir_name, self.orig_meta_str)
+        self.sws_path: str = f"{self.path}/{self.orig_meta_str}.sws"
+        self.data_path: str = f"{self.path}/{self.orig_meta_str}"
+        self.xy_path: str = f"{self.data_path}/XYZPositions.txt"
+        self.min_z: int = 999999  # Arbitrarily high number
+        self.max_z: int = -999999  # Arbitrarily low number
+        self.zoom: Optional[str] = None
+        self.illumination: Optional[str] = None
+        self.z_dist: Optional[str] = None
         self._z_stack()
         self._parse_meta()
-        short_meta = [
+        if not self.zoom or not self.illumination:
+            raise ValueError("Zoom or illumination not found in metadata")
+        short_meta: list[str] = [
             self.zoom,
             self.illumination,
             f"{(self.max_z - self.min_z + 1):02d}z",
         ]
-        self.short_meta = filter(bool, short_meta)
-        self.new_meta_str = f"{slide}_{'_'.join(short_meta)}"
-        self.new_dir = f"{dir_name}/{self.new_meta_str}"
+        self.short_meta: list[str] = list(filter(bool, short_meta))  # Used anywhere?
+        self.new_meta_str: str = f"{slide}_{'_'.join(short_meta)}"  # self.short_meta?
+        self.new_dir: str = f"{dir_name}/{self.new_meta_str}"
 
     def tc_path(self, layer):
         return f"{self.data_path}/TileConfiguration_{layer}.txt"
@@ -82,4 +86,5 @@ class DigiSlide:
             "illumination": self.illumination,
             "z_distance": self.z_dist,
             "original_metadata": self.orig_meta_str,
+            "original_parent_path": self.dir_name,
         }
