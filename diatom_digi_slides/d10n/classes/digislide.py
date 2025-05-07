@@ -32,7 +32,7 @@ class DigiSlide:
         self.short_meta: list[str] = list(filter(bool, short_meta))  # Used anywhere?
         self.new_meta_str: str = f"{slide}_{'_'.join(short_meta)}"  # self.short_meta?
         self.new_dir: str = f"{dir_name}/{self.new_meta_str}"
-        self.tile_ext = ext
+        self.tile_ext: str = ext
 
     def tc_path(self, layer):
         return f"{self.data_path}/TileConfiguration_{layer}.txt"
