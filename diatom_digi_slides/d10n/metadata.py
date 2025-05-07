@@ -33,7 +33,7 @@ def make_tile_config(ds: DigiSlide) -> None:
             if not y_min or y_curr < y_min:
                 y_min = y_curr
 
-            coord = (f"Tile{int(row[0]):06d}.tif", x_curr, y_curr)
+            coord = (f"Tile{int(row[0]):06d}.{ds.tile_ext}", x_curr, y_curr)
             layers.setdefault(z_curr, []).append(coord)
 
     if not x_min or not y_min:

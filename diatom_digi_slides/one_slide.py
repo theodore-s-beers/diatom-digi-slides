@@ -22,10 +22,18 @@ from .d10n.classes.digislide import DigiSlide
 
 def main() -> None:
     print(f"start: {datetime.now()}")
-    ds: DigiSlide = setup(sys.argv[1])
+
+    args = sys.argv[1:]
+    if not args:
+        print("Usage: one_slide <directory> [--tiff]", file=sys.stderr)
+        sys.exit(1)
+
+    ds: DigiSlide = setup(args)
+
     metadata_prep(ds)
     convert(ds)
     archive(ds)
+
     print(f"stop: {datetime.now()}")
 
 

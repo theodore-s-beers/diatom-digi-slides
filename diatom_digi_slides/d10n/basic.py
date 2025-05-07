@@ -7,16 +7,18 @@ from . import dij, metadata
 from .classes.digislide import DigiSlide
 
 
-def setup(arg: str) -> DigiSlide:
-    if not os.path.isdir(arg):
-        raise ValueError(f"{arg} is not a directory")
+def setup(args: list[str]) -> DigiSlide:
+    if not os.path.isdir(args[0]):
+        raise ValueError(f"{args[0]} is not a directory")
 
-    ap = os.path.abspath(arg)
+    ap = os.path.abspath(args[0])
     dn, bn = os.path.split(ap)
     meta = bn.split("_")
     slide = meta.pop(0)
 
-    return DigiSlide(dn, slide, meta)
+    ext = "tiff" if len(args) > 1 and args[1] == "--tiff" else "tif"
+
+    return DigiSlide(dn, slide, meta, ext)
 
 
 def metadata_prep(ds: DigiSlide) -> None:

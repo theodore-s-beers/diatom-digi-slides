@@ -5,7 +5,7 @@ from typing import Optional
 
 
 class DigiSlide:
-    def __init__(self, dir_name: str, slide: str, metadata: list[str]):
+    def __init__(self, dir_name: str, slide: str, metadata: list[str], ext: str):
         self.dir_name: str = dir_name
         self.slide: str = slide
         self.sample: str = metadata[0]
@@ -32,6 +32,7 @@ class DigiSlide:
         self.short_meta: list[str] = list(filter(bool, short_meta))  # Used anywhere?
         self.new_meta_str: str = f"{slide}_{'_'.join(short_meta)}"  # self.short_meta?
         self.new_dir: str = f"{dir_name}/{self.new_meta_str}"
+        self.tile_ext = ext
 
     def tc_path(self, layer):
         return f"{self.data_path}/TileConfiguration_{layer}.txt"
@@ -46,7 +47,7 @@ class DigiSlide:
 
     def new_z_tif(self, z):
         # z_norm = z - self.min_z + 1
-        return f"{self.new_z_name(z)}.tif"
+        return f"{self.new_z_name(z)}.{self.tile_ext}"
 
     def _z_stack(self):
         with open(self.xy_path, newline="", encoding="utf_16_le") as csvfile:
